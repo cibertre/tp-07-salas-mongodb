@@ -2,205 +2,229 @@
 
 ## Descripción
 
-Este trabajo práctico es una continuación del TP 06, donde hice una aplicación para consultar salas de estudio y registrar reservas.
+En este trabajo práctico continué con la aplicación de reservas de salas que había realizado en el TP06. En esta oportunidad agregué una parte para trabajar con MongoDB y guardar reservas en una base de datos.
 
-En esta nueva versión agregué MongoDB y Mongoose para empezar a guardar las reservas en una base de datos y poder consultarlas después.
+La aplicación web sigue funcionando como en el trabajo anterior. También agregué scripts que permiten comprobar la conexión con MongoDB, validar los datos de una reserva, crear reservas y consultar las que están guardadas.
 
-La aplicación web sigue funcionando como en el trabajo anterior. Las reservas que se crean desde el formulario se guardan en memoria, mientras que las reservas de MongoDB se crean y se consultan desde programas que se ejecutan en la terminal.
+El objetivo fue comenzar a trabajar con una base de datos sin modificar el funcionamiento de la aplicación web que ya tenía realizada.
 
 ## Tecnologías utilizadas
 
-- Node.js
+Para realizar el trabajo utilicé:
+
+- Node.js v22.16.0
 - Express
 - EJS
-- MongoDB Atlas Free (M0)
+- Express EJS Layouts
+- MongoDB Atlas
 - Mongoose
 - Morgan
 - ESLint
 - Prettier
 
-Para realizar el trabajo utilicé Node.js, npm y las dependencias instaladas en el proyecto. Las versiones exactas se pueden consultar con los comandos que aparecen más abajo.
-
 ## Instalación
 
-Primero hay que descargar o clonar el repositorio y abrir una terminal en la carpeta del proyecto.
+Para ejecutar el proyecto, primero hay que descargarlo o clonarlo desde el repositorio y abrir una terminal dentro de la carpeta del proyecto.
 
-Instalar las dependencias con:
+Después se instalan las dependencias con el siguiente comando:
 
 ```bash
 npm install
 ```
 
-Después hay que configurar las variables de entorno para poder conectar con MongoDB Atlas.
+También hay que configurar el archivo `.env` con los datos necesarios para conectarse con MongoDB.
 
-## Configuración de MongoDB Atlas
+Este archivo contiene información privada, por eso está excluido del repositorio y no debe subirse con las credenciales reales.
 
-Para este trabajo utilicé MongoDB Atlas con un clúster gratuito Free (M0).
+## Configuración de MongoDB
 
-Los pasos para preparar la conexión son:
+Para este trabajo utilicé MongoDB Atlas.
 
-1. Crear un clúster gratuito en MongoDB Atlas.
-2. Crear un usuario de base de datos con permisos de lectura y escritura.
-3. Configurar la dirección IP desde la cual se va a conectar la aplicación.
-4. Obtener la URI de conexión desde Atlas.
-5. Copiar el archivo `.env.example` y crear un archivo llamado `.env`.
-6. Reemplazar los datos de ejemplo por los datos reales de la conexión.
+La base de datos se llama `reservas_salas_u7` y la colección utilizada es `reservas`. En esa colección se guardan los documentos correspondientes a las reservas creadas mediante los scripts del trabajo práctico.
 
-El archivo `.env` contiene las variables necesarias para ejecutar el proyecto. La variable `MONGODB_URI` guarda la dirección de conexión a MongoDB.
+La conexión se configura mediante la variable `MONGODB_URI`, que se encuentra en el archivo `.env`.
 
-La base de datos utilizada para este trabajo es `reservas_salas_u7` y la colección se llama `reservas`.
+Para conectarse correctamente, hay que tener configurado el usuario de la base de datos y los permisos de acceso correspondientes en MongoDB Atlas.
 
-Por seguridad, el archivo `.env` no se debe subir a GitHub, porque contiene datos privados. En cambio, se incluye `.env.example` como ejemplo de las variables necesarias, sin credenciales reales.
+También utilicé MongoDB Compass para ingresar al clúster, consultar la base de datos y comprobar que los documentos estuvieran guardados.
 
-## Organización de los archivos
+## Dependencias
 
-Los archivos principales del proyecto están organizados de la siguiente manera:
+Las dependencias utilizadas en el proyecto son las siguientes.
 
-- `src/index.js`: inicia la aplicación y contiene las reservas iniciales que utiliza el sitio web.
-- `src/app.js`: configura Express, las vistas, los recursos públicos y las rutas principales.
-- `src/config/entorno.js`: lee y valida la configuración del entorno y la URI de MongoDB.
-- `src/config/base-datos.js`: contiene las funciones para conectar y desconectar MongoDB. También configura los servidores DNS utilizados en la conexión.
-- `src/modelos/reservas.js`: define el modelo `Reserva` y las reglas de validación de los datos.
-- `src/servicios/serviceReserva.js`: administra las reservas que se guardan en memoria.
-- `src/controladores/controlReserva.js`: recibe las solicitudes y decide qué vista mostrar o a qué dirección redirigir.
-- `src/rutas/rutasReserva.js`: define las rutas relacionadas con las reservas.
-- `src/middlewares/`: contiene los middlewares utilizados por la aplicación.
-- `src/views/`: contiene las vistas EJS.
-- `public/`: contiene los archivos públicos, como los estilos y las imágenes.
-- `scripts/comprobar-conexion.js`: prueba la conexión con MongoDB.
-- `scripts/validar-reserva.js`: comprueba si una reserva cumple las reglas del modelo sin guardarla.
-- `scripts/crear-reserva.js`: crea una reserva en MongoDB.
-- `scripts/listar-reservas.js`: consulta las reservas guardadas y muestra el resultado en la terminal.
+**Dependencias principales:**
 
-## Modelo Reserva
+- `ejs`: permite generar las páginas que se muestran en el navegador.
+- `express`: se utiliza para crear el servidor y manejar las rutas.
+- `express-ejs-layouts`: permite utilizar una estructura común para las vistas.
+- `mongoose`: permite conectarse con MongoDB y trabajar con los documentos.
+- `morgan`: muestra información de las solicitudes que recibe el servidor.
 
-Para trabajar con las reservas creé un modelo llamado `Reserva` utilizando Mongoose. El modelo está asociado a la colección `reservas`.
+**Dependencias de desarrollo:**
 
-Los campos utilizados son:
+- `@eslint/js` y `eslint`: ayudan a revisar el código y encontrar posibles errores.
+- `prettier`: permite mantener un formato ordenado en los archivos.
 
-| Campo | Tipo | Validación |
-|---|---|---|
-| estudiante | String | Es obligatorio y elimina espacios al principio y al final. |
-| email | String | Es obligatorio y debe contener el carácter `@`. |
-| sala | String | Solo permite Sala Norte, Sala Sur o Sala Multimedia. |
-| fecha | String | Es obligatoria y elimina espacios al principio y al final. |
-| turno | String | Solo permite Mañana, Tarde o Noche. |
-| personas | Number | Es obligatorio, debe ser entero y estar entre 1 y 6. |
+## Organización del proyecto
 
-Estas validaciones sirven para evitar que se guarden reservas con datos que no cumplen las condiciones indicadas.
+El proyecto está organizado en carpetas para separar las distintas partes de la aplicación.
 
-De todas maneras, todavía no se comprueba que el correo sea completamente válido ni que la fecha exista realmente en el calendario. Tampoco se controlan los turnos repetidos o los cruces de reservas.
+- `src/config`: contiene la configuración del entorno y la conexión con la base de datos.
+- `src/modelos`: contiene el modelo de las reservas.
+- `src/servicios`: contiene la lógica relacionada con las reservas de la aplicación web.
+- `src/controladores`: contiene el código que procesa las solicitudes.
+- `src/rutas`: contiene las rutas de la aplicación.
+- `src/middlewares`: contiene los middlewares utilizados por la aplicación.
+- `views`: contiene las vistas realizadas con EJS.
+- `public`: contiene los archivos públicos, como los estilos.
+- `scripts`: contiene los archivos que se ejecutan desde la terminal para trabajar con MongoDB.
 
-## Programas de MongoDB
+## Modelo de reserva
 
-Para ejecutar los programas de prueba se utiliza la terminal, desde la carpeta principal del proyecto.
+El modelo se creó con Mongoose y define los campos que debe tener una reserva.
 
-### Comprobar la conexión
+|      Campo   |  Tipo  |            Descripción            |
+|--------------|--------|-----------------------------------|
+| `estudiante` | String |      Nombre del estudiante        |
+|    `email`   | String | Correo electrónico del estudiante |
+|    `sala`    | String |     Sala que se desea reservar    |
+|   `fecha`    | String |           Fecha de la reserva     |
+|   `turno`    | String |             Turno elegido         |
+|   `personas` | Number |          Cantidad de personas     |
 
-```bash
-npm run comprobardb
-```
+El modelo incluye validaciones para controlar los datos antes de guardarlos.
 
-Este comando intenta conectarse a MongoDB Atlas. Si la conexión funciona, muestra un mensaje de confirmación y termina. Si falla, muestra información del error sin publicar la URI privada.
+- El nombre, el correo, la sala, la fecha y el turno son obligatorios.
+- El nombre, el correo y la fecha eliminan los espacios al principio y al final.
+- El correo debe contener el símbolo `@`.
+- Las salas permitidas son Sala Norte, Sala Sur y Sala Multimedia.
+- Los turnos permitidos son Mañana, Tarde y Noche.
+- La cantidad de personas debe ser un número entero entre 1 y 6.
 
-### Validar una reserva
+MongoDB genera automáticamente el identificador `_id` de cada documento.
 
-```bash
-npm run validar
-```
+## Scripts para trabajar con MongoDB
 
-Este programa comprueba una reserva de ejemplo utilizando las validaciones del modelo. No guarda ningún documento en la base de datos.
+Agregué los siguientes comandos en el archivo `package.json` para ejecutar las pruebas desde la terminal.
 
-### Crear una reserva
+|          Comando      |                                Función                            |
+|-----------------------|-------------------------------------------------------------------|
+| `npm run comprobardb` |           Comprueba la conexión con MongoDB.                      |
+|     `npm run validar` | Comprueba si los datos de una reserva son válidos, sin guardarla. |
+|       `npm run crear` |              Crea una reserva en la base de datos.                |
+|      `npm run listar` |             Muestra las reservas guardadas en la colección.       |
 
-```bash
-npm run crear
-```
+Estos comandos ejecutan los siguientes archivos:
 
-Este programa crea una reserva de ejemplo en MongoDB y muestra el identificador `_id` que devuelve la base de datos.
+- `scripts/comprobar-conexion.js`
+- `scripts/validar-reserva.js`
+- `scripts/crear-reserva.js`
+- `scripts/listar-reserva.js`
 
-Si se ejecuta más de una vez, se pueden guardar varias reservas con datos iguales, pero con identificadores diferentes.
+Los scripts utilizan la configuración del archivo `.env` para conectarse a la base de datos.
 
-### Listar las reservas
+## Matriz de pruebas
 
-```bash
-npm run listar
-```
+Realicé pruebas para comprobar la conexión con MongoDB, la validación de los datos, la creación de reservas, la consulta de documentos y la persistencia de la información.
 
-Este programa consulta las reservas guardadas en MongoDB, muestra sus datos en la terminal y presenta la cantidad de documentos encontrados.
+En la siguiente tabla se muestran los resultados obtenidos.
 
-La consulta no crea ni elimina registros. Si la colección está vacía, debe informar que hay cero reservas.
+| N.º | Prueba | Resultado esperado | Resultado obtenido | Estado |
+|---:|---|---|---|---|
+| 1  | Conexión con MongoDB | Establecer la conexión | La terminal mostró `Conexión con MongoDB establecida` | Aprobada |
+| 2  | Validación de una reserva válida | Validar los datos sin guardar la reserva | La terminal mostró que los datos son válidos y que todavía no se guardaron | Aprobada |
+| 3  | Crear una reserva | Guardar la reserva y mostrar su identificador | Se guardó una reserva y se mostró el `_id` `6acf5b296d22947acbff2307` | Aprobada |
+| 4  | Listar las reservas | Mostrar los documentos guardados | Se mostraron dos reservas y el total fue 2 | Aprobada |
+| 5  | Persistencia de los datos | Mantener los documentos al terminar el proceso | Después de cerrar la aplicación y ejecutar nuevamente el listado, aparecieron las mismas dos reservas | Aprobada |
+| 6  | Comprobar los documentos en MongoDB Compass | Ver los documentos en la base y colección correctas | Se encontraron dos documentos en `reservas_salas_u7`, colección `reservas` | Aprobada |
+| 7  | Formato del código | Comprobar que los archivos tengan el formato correcto | Prettier mostró `All matched files use Prettier code style!` | Aprobada |
+| 8  | Revisión con ESLint | Revisar el código sin errores reportados | ESLint se ejecutó y no mostró errores en la salida compartida | Aprobada |
+| 9  | Inicio de la aplicación web | Iniciar el servidor correctamente | La terminal mostró `Aplicación disponible en http://localhost:3000` | Aprobada |
+| 10 | Funcionamiento de la aplicación web | Mantener el funcionamiento del TP06 | La aplicación mostró las cuatro reservas iniciales y permitió crear nuevas reservas | Aprobada |
+| 11 | Reservas web en memoria | Comprobar que las reservas del formulario no persistan al reiniciar | La reserva creada desde el formulario desapareció al reiniciar la aplicación | Aprobada |
+| 12 | Estudiante vacío | Rechazar una reserva sin estudiante | Falta comprobar individualmente | Pendiente |
+| 13 | Correo inválido | Rechazar un correo que no cumpla la validación | Falta comprobar individualmente | Pendiente |
+| 14 | Sala no permitida | Rechazar una sala que no esté en la lista permitida | Falta comprobar individualmente | Pendiente |
+| 15 | Turno no permitido | Rechazar un turno que no esté permitido | Falta comprobar individualmente | Pendiente |
+| 16 | Fecha vacía | Rechazar una reserva sin fecha | Falta comprobar individualmente | Pendiente |
+| 17 | Personas igual a 0 | Rechazar una cantidad inferior al mínimo | Falta comprobar individualmente | Pendiente |
+| 18 | Personas igual a 7 | Rechazar una cantidad superior al máximo | Falta comprobar individualmente | Pendiente |
+| 19 | Personas igual a 2.5 | Rechazar una cantidad que no sea entera | Falta comprobar individualmente | Pendiente |
+| 20 | Personas con texto | Rechazar un valor que no sea numérico | Falta comprobar individualmente | Pendiente |
 
-## Pruebas realizadas
+### Observaciones de las pruebas
 
-Para comprobar el funcionamiento del trabajo realicé pruebas de conexión, creación, consulta y validación de los datos.
+La conexión con MongoDB funcionó correctamente. También pude crear reservas mediante los scripts y consultar los documentos almacenados.
 
-También probé los siguientes casos:
+La persistencia se comprobó ejecutando nuevamente el listado después de cerrar la aplicación y revisando los documentos desde MongoDB Compass. Las dos reservas continuaron guardadas en la base de datos.
 
-- Conexión correcta con MongoDB.
-- Creación de una reserva válida.
-- Consulta de las reservas desde otro proceso de Node.js.
-- Comprobación de que el mismo `_id` sigue apareciendo después de terminar y volver a ejecutar los programas.
-- Verificación de que una segunda consulta no agrega registros.
-- Rechazo de un estudiante vacío.
-- Rechazo de un correo sin `@`.
-- Rechazo de una sala o un turno que no están permitidos.
-- Rechazo de una fecha vacía.
-- Rechazo de cantidades de personas fuera del rango permitido o que no son enteras.
-- Rechazo de un valor de personas que no se puede convertir a número.
-- Comprobación del funcionamiento de la aplicación web y sus rutas.
+Por otro lado, comprobé que la aplicación web sigue trabajando con las reservas que tiene cargadas en memoria. Las cuatro reservas iniciales continúan apareciendo y las nuevas reservas creadas desde el formulario se pierden al reiniciar el servidor.
 
-Los resultados y las capturas de las pruebas se deben presentar junto con esta documentación para mostrar lo que se comprobó durante la ejecución.
+Las pruebas de datos inválidos que aparecen como pendientes deben ejecutarse individualmente antes de presentar la matriz como completamente terminada.
 
-## Comandos de calidad
+## Formato y revisión del código
 
-Para ordenar el formato de los archivos utilizo:
+Para corregir el formato de los archivos utilicé el comando:
 
 ```bash
 npm run format
 ```
 
-Para comprobar el formato y revisar posibles errores de código utilizo:
+Después ejecuté:
 
 ```bash
 npm run check
 ```
 
-Este último comando ejecuta Prettier en modo de comprobación y ESLint sobre los archivos de `src` y `scripts`.
+Este último comando comprueba el formato con Prettier y luego revisa el código con ESLint.
 
-## Ejecutar la aplicación web
+La terminal mostró el mensaje `All matched files use Prettier code style!`, indicando que los archivos revisados cumplen con el formato esperado.
 
-Para iniciar la aplicación utilizo:
+Luego se ejecutó ESLint sin que aparecieran errores en la salida obtenida.
+
+## Ejecución de la aplicación web
+
+La aplicación web se inicia con el siguiente comando:
 
 ```bash
 npm start
 ```
 
-La aplicación se ejecuta en el puerto 3000, salvo que se configure otro puerto mediante la variable `PORT`.
+Una vez iniciado el servidor, se puede abrir el navegador y acceder a:
 
-Las rutas principales son:
+`http://localhost:3000`
 
-- `/`: muestra la página de inicio.
-- `/estado`: devuelve información sobre la cantidad de reservas y el identificador de la solicitud.
-- `/reservas`: muestra el listado de reservas.
-- `/reservas/nueva`: muestra el formulario para crear una reserva.
+Las rutas principales de la aplicación son:
+
+- `/`: página de inicio.
+- `/estado`: permite consultar el estado de la aplicación.
+- `/reservas`: muestra las reservas.
+- `/reservas/nueva`: presenta el formulario para crear una reserva.
 - `/reservas/:id`: muestra el detalle de una reserva.
-- `/api/reservas`: devuelve las reservas en formato JSON.
+- `/api/reservas`: permite consultar las reservas mediante la API.
 
-También se comprueba el funcionamiento de los formularios, las redirecciones, los errores de validación y las páginas no encontradas.
+La aplicación web mantiene su funcionamiento anterior, mientras que los scripts permiten trabajar con los documentos guardados en MongoDB.
 
-## Diferencia entre memoria y MongoDB
+## Diferencia entre las reservas en memoria y MongoDB
 
-En este trabajo las reservas del sitio web siguen guardándose en un arreglo de JavaScript que está en memoria. Por eso, las reservas creadas desde el formulario no permanecen cuando se reinicia el servidor.
+Una diferencia importante es que las reservas de la aplicación web se guardan en memoria. Por eso, se pierden al reiniciar el servidor.
 
-En cambio, los programas de terminal utilizan Mongoose para guardar y consultar las reservas en MongoDB Atlas. Los documentos que se guardan de esta manera permanecen en la base de datos aunque termine el programa.
+En cambio, las reservas creadas mediante los scripts se guardan en MongoDB y permanecen en la base de datos aunque termine el proceso de Node.js.
 
-Por ahora, las dos partes funcionan por separado. En esta etapa no se pidió modificar el servicio ni los controladores de Express para trabajar directamente con MongoDB. Esa integración se podrá realizar más adelante, cuando se avance con los temas de la unidad 8.
+En este trabajo ambas partes se mantienen separadas. El objetivo es comenzar a trabajar con persistencia en MongoDB sin modificar el funcionamiento de la aplicación realizada en el TP06.
+
+## Seguridad
+
+El archivo `.env` está excluido del repositorio porque contiene la configuración privada de la conexión con MongoDB.
+
+De esta manera se evita publicar la contraseña y otros datos de acceso. Si otra persona necesita ejecutar el proyecto, debe configurar sus propias credenciales.
+
+También se debe incluir un archivo `.env.example` con valores de ejemplo, sin contraseñas reales, para indicar qué variables necesita configurar el proyecto.
 
 ## Conclusión
 
-Con este trabajo pude empezar a utilizar MongoDB Atlas y Mongoose para guardar y recuperar datos desde Node.js.
+Con este trabajo pude practicar la conexión de Node.js con MongoDB utilizando Mongoose, crear un modelo con validaciones y guardar y consultar documentos desde scripts.
 
-También pude practicar la creación de modelos, las validaciones, la conexión con una base de datos y las consultas desde programas independientes.
+También pude comprobar la diferencia entre trabajar con datos en memoria y utilizar una base de datos para conservar la información.
 
-La aplicación web conserva el funcionamiento del TP 06, mientras que los nuevos programas permiten comprobar la persistencia de las reservas en MongoDB.
+Por último, revisé el formato y el código del proyecto con Prettier y ESLint, y comprobé que la aplicación web sigue funcionando como en el trabajo anterior.
